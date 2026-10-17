@@ -1,0 +1,197 @@
+/* ==========================================================================
+   掠影 · 页面悬浮按钮
+   所有选择器都限定在 #epd-extract-fab-root 下，避免影响宿主页面样式。
+   ========================================================================== */
+
+#epd-extract-fab-root {
+  all: initial !important;
+  position: fixed !important;
+  right: max(22px, env(safe-area-inset-right)) !important;
+  bottom: max(22px, env(safe-area-inset-bottom)) !important;
+  z-index: 2147483647 !important;
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  pointer-events: none !important;
+  font-family: "HarmonyOS Sans SC", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif !important;
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+#epd-extract-fab-root .epd-fab {
+  all: unset;
+  position: relative;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-width: 116px;
+  min-height: 46px;
+  padding: 0 18px 0 15px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  background: #141b18;
+  color: #f7f8f4;
+  box-shadow:
+    0 9px 24px rgba(7, 14, 11, 0.24),
+    0 2px 6px rgba(7, 14, 11, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  font-family: "HarmonyOS Sans SC", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  pointer-events: auto;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition:
+    transform 180ms cubic-bezier(0.2, 0.7, 0.2, 1),
+    box-shadow 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease;
+}
+
+#epd-extract-fab-root .epd-fab:hover {
+  transform: translateY(-2px);
+  background: #1e2823;
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow:
+    0 14px 30px rgba(7, 14, 11, 0.28),
+    0 3px 8px rgba(7, 14, 11, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+#epd-extract-fab-root .epd-fab:active {
+  transform: translateY(0);
+  box-shadow:
+    0 5px 14px rgba(7, 14, 11, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+#epd-extract-fab-root .epd-fab:focus-visible {
+  outline: 2px solid #e04a37;
+  outline-offset: 3px;
+}
+
+#epd-extract-fab-root .epd-fab__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 19px;
+  height: 19px;
+  flex: 0 0 auto;
+  color: #f2f4ef;
+  transition: transform 220ms cubic-bezier(0.2, 0.7, 0.2, 1), color 180ms ease;
+}
+
+#epd-extract-fab-root .epd-fab__icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+#epd-extract-fab-root .epd-fab:hover .epd-fab__icon {
+  transform: rotate(-6deg) scale(1.04);
+  color: #ffd9d2;
+}
+
+#epd-extract-fab-root .epd-fab__text {
+  display: inline-block;
+  min-width: 56px;
+  text-align: center;
+}
+
+/* 已提取数量徽标 */
+#epd-extract-fab-root .epd-fab__badge {
+  position: absolute;
+  top: -7px;
+  right: -5px;
+  display: none;
+  min-width: 21px;
+  height: 21px;
+  padding: 0 5px;
+  border: 2px solid #f3f4ef;
+  border-radius: 999px;
+  background: #d33a2c;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 17px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(90, 13, 6, 0.28);
+  font-variant-numeric: tabular-nums;
+}
+
+#epd-extract-fab-root .epd-fab__badge.is-visible {
+  display: block;
+}
+
+/* 忙碌状态：呼吸提示，不改变布局宽度 */
+#epd-extract-fab-root .epd-fab[data-state="busy"] {
+  cursor: progress;
+  background: #1d2622;
+}
+
+#epd-extract-fab-root .epd-fab[data-state="busy"] .epd-fab__icon {
+  animation: epd-fab-breathe 1.2s ease-in-out infinite;
+}
+
+#epd-extract-fab-root .epd-fab[data-state="empty"],
+#epd-extract-fab-root .epd-fab[data-state="error"] {
+  background: #6e2b23;
+  border-color: rgba(255, 255, 255, 0.17);
+}
+
+#epd-extract-fab-root .epd-fab:disabled {
+  cursor: progress;
+}
+
+@keyframes epd-fab-breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.94);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+@media (max-width: 520px) {
+  #epd-extract-fab-root {
+    right: max(14px, env(safe-area-inset-right)) !important;
+    bottom: max(14px, env(safe-area-inset-bottom)) !important;
+  }
+
+  #epd-extract-fab-root .epd-fab {
+    min-width: 106px;
+    min-height: 43px;
+    padding: 0 15px 0 13px;
+    font-size: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #epd-extract-fab-root .epd-fab,
+  #epd-extract-fab-root .epd-fab__icon {
+    transition: none;
+  }
+
+  #epd-extract-fab-root .epd-fab:hover {
+    transform: none;
+  }
+
+  #epd-extract-fab-root .epd-fab[data-state="busy"] .epd-fab__icon {
+    animation: none;
+    opacity: 0.8;
+  }
+}

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>商品图提取 · 掠影</title>
+    <link rel="stylesheet" href="gallery.css" />
+  </head>
+  <body>
+    <header class="masthead">
+      <div class="brand">
+        <span class="brand__seal" aria-hidden="true">图</span>
+        <div class="brand__copy">
+          <h1 class="brand__title">商品图提取</h1>
+          <p class="brand__meta">
+            <span id="platform-chip" class="platform-chip" hidden></span>
+            <span id="source-host" class="source-host">正在读取来源…</span>
+            <span id="extracted-at" class="extracted-at" hidden></span>
+            <a id="source-link" class="source-link" target="_blank" rel="noreferrer" hidden>返回商品页</a>
+          </p>
+        </div>
+      </div>
+
+      <div class="toolbar" role="toolbar" aria-label="图片选择与下载">
+        <p class="selection-count" aria-live="polite">
+          <strong id="selected-count">0</strong>
+          <span class="selection-count__rest">/ <span id="total-count">0</span> 张已选</span>
+        </p>
+        <div class="toolbar__actions">
+          <button id="select-all" class="btn btn--ghost" type="button" disabled>全选</button>
+          <button id="invert" class="btn btn--ghost" type="button" disabled>反选</button>
+          <button id="download" class="btn btn--primary" type="button" disabled>
+            <span id="download-label">下载选中</span>
+            <span id="download-meta" class="btn__meta">0 张</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="stage">
+      <section id="download-panel" class="download-panel" aria-live="polite" hidden>
+        <div class="download-panel__row">
+          <p id="download-status" class="download-panel__status">准备下载…</p>
+          <p id="download-progress-text" class="download-panel__count">0 / 0</p>
+        </div>
+        <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <span id="progress-fill" class="progress-track__fill"></span>
+        </div>
+        <div id="failures" class="failures" hidden>
+          <details>
+            <summary id="failures-summary">部分图片未完成</summary>
+            <ul id="failures-list"></ul>
+          </details>
+        </div>
+      </section>
+
+      <div class="stage__head">
+        <p class="stage__eyebrow">提取结果</p>
+        <p class="stage__hint">点击任意图片即可勾选 · 下载时统一转换为 PNG</p>
+      </div>
+
+      <div id="loading" class="loading">
+        <span class="loading__mark" aria-hidden="true"></span>
+        <span>正在读取提取结果…</span>
+      </div>
+
+      <section id="grid" class="grid" aria-label="提取到的商品图片" aria-busy="true"></section>
+
+      <section id="empty-state" class="empty" hidden>
+        <div class="empty__seal" aria-hidden="true">空</div>
+        <h2 id="empty-title" class="empty__title">还没有可展示的图片</h2>
+        <p id="empty-copy" class="empty__copy">
+          打开淘宝、天猫、京东或拼多多商家版的商品详情页，点击右下角「获取图片」。
+        </p>
+        <p class="empty__note">提取只读取当前页面中已展示或可懒加载的图片，不会访问其他商品。</p>
+      </section>
+    </main>
+
+    <template id="card-template">
+      <label class="shot">
+        <input class="shot__checkbox" type="checkbox" />
+        <span class="shot__frame">
+          <img class="shot__image" alt="" loading="lazy" decoding="async" />
+          <span class="shot__index" aria-hidden="true"></span>
+          <span class="shot__check" aria-hidden="true"></span>
+          <span class="shot__stamp" aria-hidden="true">未完成</span>
+          <span class="shot__error" hidden>缩略图加载失败</span>
+        </span>
+        <span class="shot__info">
+          <span class="shot__size"></span>
+          <span class="shot__source"></span>
+        </span>
+      </label>
+    </template>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <script type="module" src="gallery.js"></script>
+  </body>
+</html>

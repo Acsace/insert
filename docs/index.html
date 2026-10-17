@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>图提取 · 一键提取电商详情页图片，批量下载为 PNG</title>
+    <meta
+      name="description"
+      content="图提取是一款 Chrome / Edge 扩展，在淘宝、天猫、京东、拼多多商家版商品详情页一键提取全部商品图，过滤小图与图标，批量转换为 PNG 下载。"
+    />
+    <meta name="theme-color" content="#f7f8fc" />
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <!-- 跳转链接：键盘用户可绕过导航直达正文 -->
+    <a class="skip-link" href="#main">跳到主要内容</a>
+
+    <!-- 图标雪碧图：全站通过 <use href="#id"> 复用，不产生外部图片请求 -->
+    <svg class="sprite" aria-hidden="true" focusable="false">
+      <symbol id="i-scan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2" />
+        <path d="M2.5 12h19" />
+      </symbol>
+      <symbol id="i-filter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3.5 5h17l-6.6 7.6V19l-3.8 1.8v-8.2L3.5 5z" />
+      </symbol>
+      <symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3.5" y="3.5" width="7" height="7" rx="1.6" />
+        <rect x="13.5" y="3.5" width="7" height="7" rx="1.6" />
+        <rect x="3.5" y="13.5" width="7" height="7" rx="1.6" />
+        <rect x="13.5" y="13.5" width="7" height="7" rx="1.6" />
+      </symbol>
+      <symbol id="i-checkbox" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3.5" y="3.5" width="17" height="17" rx="4.5" />
+        <path d="M8 12.2l2.7 2.7 5.3-5.4" />
+      </symbol>
+      <symbol id="i-convert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 9.2A8 8 0 0 1 17.7 5L20 7.3" />
+        <path d="M20 3.8v3.5h-3.5" />
+        <path d="M20 14.8A8 8 0 0 1 6.3 19L4 16.7" />
+        <path d="M4 20.2v-3.5h3.5" />
+      </symbol>
+      <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 15.5v3A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5v-3" />
+        <path d="M12 3.8v9.4" />
+        <path d="M8.3 9.8L12 13.5l3.7-3.7" />
+      </symbol>
+      <symbol id="i-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3.2l8.2 4.3-8.2 4.3-8.2-4.3L12 3.2z" />
+        <path d="M3.8 12.4l8.2 4.3 8.2-4.3" />
+        <path d="M3.8 16.7l8.2 4.2 8.2-4.2" />
+      </symbol>
+      <symbol id="i-crop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 2.8v15.4h15.2" />
+        <path d="M2.8 6H18.2v15.2" />
+      </symbol>
+      <symbol id="i-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M13.8 3.2H7.4a2 2 0 0 0-2 2v13.6a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8l-4.8-4.8z" />
+        <path d="M13.6 3.4V8h4.6" />
+        <path d="M8.6 13.2h6.8M8.6 16.4h4.6" />
+      </symbol>
+      <symbol id="i-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 12h15" />
+        <path d="M13 6l6 6-6 6" />
+      </symbol>
+      <symbol id="i-arrow-up-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M7 17L17 7" />
+        <path d="M8 7h9v9" />
+      </symbol>
+    </svg>
+
+    <!-- ================= 顶部导航（吸顶 + 毛玻璃） ================= -->
+    <header class="site-header" id="top">
+      <nav class="nav container" aria-label="主导航">
+        <a class="brand" href="#top" aria-label="图提取 · 回到顶部">
+          <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true">
+            <defs>
+              <linearGradient id="brandGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#4f46e5" />
+                <stop offset="1" stop-color="#7c3aed" />
+              </linearGradient>
+            </defs>
+            <rect x="1" y="1" width="30" height="30" rx="9" fill="url(#brandGrad)" />
+            <rect x="7.5" y="7.5" width="17" height="17" rx="4.2" fill="none" stroke="#fff" stroke-opacity="0.9" stroke-width="1.7" />
+            <circle cx="20.2" cy="11.6" r="1.5" fill="#fff" />
+            <path d="M9.8 21.2l4.3-4.6 3 3 2.2-2.4 3 3.9" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <span class="brand__name">图提取</span>
+          <span class="brand__tag">v1.0</span>
+        </a>
+
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="打开菜单">
+          <span class="nav-toggle__bars" aria-hidden="true"><span></span><span></span></span>
+        </button>
+
+        <div class="nav__panel" id="nav-menu">
+          <ul class="nav__list">
+            <li><a class="nav__link" href="#intro">产品介绍</a></li>
+            <li><a class="nav__link" href="#features">核心功能</a></li>
+            <li><a class="nav__link" href="#install">安装步骤</a></li>
+          </ul>
+          <a class="btn btn--primary btn--sm nav__cta" href="assets/tu-tiqu-v1.0.0.zip" download>
+            <svg class="icon" aria-hidden="true"><use href="#i-download"></use></svg>
+            下载插件
+          </a>
+        </div>
+      </nav>
+    </header>
+
+    <main id="main">
+      <!-- ================= Hero：价值主张 + 可交互界面示意 ================= -->
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero__bg" aria-hidden="true"></div>
+        <div class="container hero__inner">
+          <div class="hero__copy reveal">
+            <p class="hero__badge">
+              <span class="hero__badge-dot" aria-hidden="true"></span>
+              适用于 Chrome / Edge · 数据只在本地
+            </p>
+            <h1 class="hero__title" id="hero-title">
+              一键提取详情页图片<span class="hero__title-break">批量下载为 PNG</span>
+            </h1>
+            <p class="hero__lede">
+              支持淘宝、天猫、京东与拼多多商家版。自动扫描懒加载图片，还原 CDN 缩略图的原图，
+              过滤图标与占位图，统一转换为 PNG，文件名自动编号。
+            </p>
+            <div class="hero__actions">
+              <a class="btn btn--primary" href="#install">
+                立即安装
+                <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+              </a>
+              <a class="btn btn--ghost" href="#features">查看功能</a>
+            </div>
+            <ul class="hero__facts">
+              <li>无需账号</li>
+              <li>图片不上传</li>
+              <li>Chrome 108+</li>
+            </ul>
+          </div>
+
+          <!-- 纯 CSS / SVG 绘制的插件界面示意；按钮可点击体验 -->
+          <div class="hero__demo demo reveal" data-demo>
+            <span class="demo__reg demo__reg--tl" aria-hidden="true"></span>
+            <span class="demo__reg demo__reg--br" aria-hidden="true"></span>
+
+            <div class="demo__window">
+              <div class="demo__chrome" aria-hidden="true">
+                <span class="demo__dots"><i></i><i></i><i></i></span>
+                <span class="demo__url">detail.tmall.com/item.htm?id=…</span>
+                <span class="demo__chrome-tail"></span>
+              </div>
+
+              <div class="demo__stage">
+                <div class="demo__page" aria-hidden="true">
+                  <div class="demo__pagebar"><i></i><i></i><i></i></div>
+                  <div class="demo__hero-photo"></div>
+                  <div class="demo__thumbs"><i></i><i></i><i></i><i></i></div>
+                  <div class="demo__lines"><i></i><i></i><i></i></div>
+                </div>
+
+                <div class="demo__sheet" data-sheet aria-hidden="true">
+                  <div class="demo__sheet-head">
+                    <span class="demo__sheet-title">已提取 <strong>18</strong> 张</span>
+                    <span class="demo__sheet-tag">PNG</span>
+                  </div>
+                  <div class="demo__tiles">
+                    <span class="demo__tile is-picked" style="--a: #dbe2ff; --b: #8b9cff"></span>
+                    <span class="demo__tile is-picked" style="--a: #e6dcff; --b: #a78bfa"></span>
+                    <span class="demo__tile" style="--a: #d7f2f4; --b: #5ec8cf"></span>
+                    <span class="demo__tile" style="--a: #ffe4e9; --b: #fb8ca3"></span>
+                    <span class="demo__tile" style="--a: #e8ecff; --b: #7c8cf8"></span>
+                    <span class="demo__tile" style="--a: #e2f0e6; --b: #7fc39a"></span>
+                  </div>
+                  <div class="demo__sheet-foot">
+                    <span class="demo__bar" aria-hidden="true"><i></i></span>
+                    <span>正在保存 …</span>
+                  </div>
+                </div>
+
+                <div class="demo__scan" aria-hidden="true"></div>
+
+                <button class="demo__fab" type="button" data-demo-button aria-pressed="false">
+                  <svg class="icon" aria-hidden="true"><use href="#i-scan"></use></svg>
+                  <span data-demo-label>获取图片</span>
+                </button>
+              </div>
+            </div>
+
+            <p class="demo__caption">
+              <span class="demo__cursor" aria-hidden="true"></span>
+              点击「获取图片」，看看会发生什么
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 产品介绍：解释要解决的问题 ================= -->
+      <section class="section" id="intro" aria-labelledby="intro-title">
+        <div class="container">
+          <div class="section-head reveal">
+            <h2 id="intro-title">商品图不该一张一张地存</h2>
+            <p>
+              详情页里的图片分散在主图轮播、详情描述、CSS 背景和懒加载属性中。手动右键另存，
+              既容易漏图，也常常把缩略图当成了原图。
+            </p>
+          </div>
+
+          <div class="problems">
+            <article class="problem reveal">
+              <span class="problem__icon" aria-hidden="true">
+                <svg class="icon"><use href="#i-layers"></use></svg>
+              </span>
+              <div>
+                <h3>图片散落在四个地方</h3>
+                <p>主图、详情图、背景图、懒加载地址各藏一部分，靠肉眼很难找全。</p>
+              </div>
+            </article>
+            <article class="problem reveal">
+              <span class="problem__icon" aria-hidden="true">
+                <svg class="icon"><use href="#i-crop"></use></svg>
+              </span>
+              <div>
+                <h3>尺寸被 CDN 悄悄改写</h3>
+                <p>页面上显示的是 430×430 缩略图，原图藏在带尺寸后缀的地址里。</p>
+              </div>
+            </article>
+            <article class="problem reveal">
+              <span class="problem__icon" aria-hidden="true">
+                <svg class="icon"><use href="#i-file"></use></svg>
+              </span>
+              <div>
+                <h3>格式无法统一</h3>
+                <p>jpg、webp、png 混在一起，交付或上架前还要逐个转换、逐个改名。</p>
+              </div>
+            </article>
+          </div>
+
+          <p class="intro__conclusion reveal">
+            图提取把这些动作合并成一次点击：扫描当前页面、还原原图、过滤无效图片，
+            再按页码顺序导出为 PNG。
+          </p>
+        </div>
+      </section>
+
+      <!-- ================= 核心功能 ================= -->
+      <section class="section section--tint" id="features" aria-labelledby="features-title">
+        <div class="container">
+          <div class="section-head reveal">
+            <h2 id="features-title">六个动作，一次完成</h2>
+            <p>从识别页面到文件落盘，全部在浏览器本地完成。不上传图片，不经过任何服务器。</p>
+          </div>
+
+          <div class="features">
+            <article class="feature reveal">
+              <span class="feature__icon" aria-hidden="true">
+                <svg class="icon"><use href="#i-scan"></use></svg>
+              </span>
+              <h3>一键提取</h3>
+              <p>扫描 img、srcset、data-src、data-lazy-src 与 background-image，兼容淘宝、京东、拼多多的懒加载写法。</p>
+            </article>
+
+            <article class="feature reveal">
+              <span class="feature__icon" aria-hidden="true">
+                <svg class="icon"><use href="#i-filter"></use></svg>
+              </span>
+              <h3>智能过滤</h3>
+              <p>排除 logo、图标、1×1 像素与小于 100×100 的图片，并剥离 CDN 尺寸后缀，尽量取回原图。</p>
+            </article>
+
+            <article class="feature reveal">
+              <span class="feature__icon" aria-hidden="true">
+                <svg class="icon"><use href="#i-grid"></use></svg>
+              </span>
+              <h3>集中预览</h3>
+              <p>结果在新标签页以网格展示，附尺寸与来源；缩略图加载失败会明确标出，不默默丢图。</p>
+            </article>
+
+            <article class="feature reveal">
+              <span class="feature__icon" aria-hidden="true">
+                <svg class="icon"><use href="#i-checkbox"></use></svg>
+              </span>
+              <h3>自由勾选</h3>
+              <p>支持全选、反选与单张勾选，已选数量实时显示。只下载需要的图，不必整页打包。</p>
+            </article>
+
+            <article class="feature reveal">
+              <span class="feature__icon" aria-hidden="true">
+                <svg class="icon"><use href="#i-convert"></use></svg>
+              </span>
+              <h3>统一 PNG</h3>
+              <p>在扩展内用 canvas 重新编码，jpg、webp、gif 都会输出为标准 PNG，透明背景不丢失。</p>
+            </article>
+
+            <article class="feature reveal">
+              <span class="feature__icon" aria-hidden="true">
+                <svg class="icon"><use href="#i-download"></use></svg>
+              </span>
+              <h3>批量下载</h3>
+              <p>按「商品图_001.png」自动编号，逐张显示进度；失败项会给出原因，可单独重试。</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 安装步骤 ================= -->
+      <section class="section" id="install" aria-labelledby="install-title">
+        <div class="container install">
+          <div class="install__intro reveal">
+            <h2 id="install-title">四步装好，三十秒</h2>
+            <p class="install__lede">
+              扩展以「解压后加载」的方式安装，不经过应用商店审核。下载后请把文件夹放在固定位置，
+              移动位置后需要重新加载。
+            </p>
+            <a class="btn btn--primary install__download" href="assets/tu-tiqu-v1.0.0.zip" download>
+              <svg class="icon" aria-hidden="true"><use href="#i-download"></use></svg>
+              下载插件
+            </a>
+            <p class="install__note">
+              安装后建议固定到工具栏。之后打开商品详情页，点击右下角「获取图片」即可。
+            </p>
+          </div>
+
+          <ol class="steps">
+            <li class="step reveal">
+              <span class="step__num" aria-hidden="true">1</span>
+              <div class="step__body">
+                <h3>下载并解压</h3>
+                <p>点击「下载插件」获取压缩包，解压到本地一个固定的文件夹。</p>
+              </div>
+            </li>
+            <li class="step reveal">
+              <span class="step__num" aria-hidden="true">2</span>
+              <div class="step__body">
+                <h3>打开扩展管理页</h3>
+                <p>地址栏输入 <code>chrome://extensions</code> 或 <code>edge://extensions</code>，回车打开。</p>
+              </div>
+            </li>
+            <li class="step reveal">
+              <span class="step__num" aria-hidden="true">3</span>
+              <div class="step__body">
+                <h3>开启开发者模式</h3>
+                <p>在页面右上角打开「开发者模式」开关，页面会出现加载入口。</p>
+              </div>
+            </li>
+            <li class="step reveal">
+              <span class="step__num" aria-hidden="true">4</span>
+              <div class="step__body">
+                <h3>加载扩展文件夹</h3>
+                <p>点击「加载已解压的扩展程序」，选择包含 <code>manifest.json</code> 的文件夹。</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- ================= 底部 CTA ================= -->
+      <section class="cta" id="download" aria-labelledby="download-title">
+        <div class="container cta__inner reveal">
+          <div>
+            <h2 id="download-title">把详情页的图，收进一个文件夹</h2>
+            <p>离线安装包，体积不到 100 KB。装好后无需联网授权，图片始终留在你的电脑里。</p>
+          </div>
+          <div class="cta__actions">
+            <a class="btn btn--light" href="assets/tu-tiqu-v1.0.0.zip" download>
+              <svg class="icon" aria-hidden="true"><use href="#i-download"></use></svg>
+              下载插件
+            </a>
+            <a class="btn btn--outline-light" href="#install">查看安装步骤</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ================= Footer ================= -->
+    <footer class="footer">
+      <div class="container footer__inner">
+        <div class="footer__brand">
+          <a class="brand" href="#top" aria-label="图提取 · 回到顶部">
+            <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true">
+              <defs>
+                <linearGradient id="footerGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#4f46e5" />
+                  <stop offset="1" stop-color="#7c3aed" />
+                </linearGradient>
+              </defs>
+              <rect x="1" y="1" width="30" height="30" rx="9" fill="url(#footerGrad)" />
+              <rect x="7.5" y="7.5" width="17" height="17" rx="4.2" fill="none" stroke="#fff" stroke-opacity="0.9" stroke-width="1.7" />
+              <circle cx="20.2" cy="11.6" r="1.5" fill="#fff" />
+              <path d="M9.8 21.2l4.3-4.6 3 3 2.2-2.4 3 3.9" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <span class="brand__name">图提取</span>
+          </a>
+          <p>一款把商品图从详情页里「捞」出来，并整理成 PNG 的浏览器扩展。</p>
+        </div>
+
+        <div class="footer__cols">
+          <div class="footer__col">
+            <h3>支持平台</h3>
+            <ul>
+              <li>淘宝 / 天猫</li>
+              <li>京东</li>
+              <li>拼多多商家版</li>
+            </ul>
+          </div>
+          <div class="footer__col">
+            <h3>资源</h3>
+            <ul>
+              <li><a href="#install">安装步骤</a></li>
+              <li><a href="assets/tu-tiqu-v1.0.0.zip" download>离线安装包</a></li>
+              <li>
+                <a href="https://github.com/" target="_blank" rel="noopener noreferrer">
+                  GitHub
+                  <svg class="icon icon--inline" aria-hidden="true"><use href="#i-arrow-up-right"></use></svg>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="footer__bottom">
+          <p>© <span data-year>2026</span> 图提取 · 仅用于你拥有使用权的图片</p>
+          <p>兼容 Chrome 108+ / Edge 108+ · 不收集任何数据</p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+  </body>
+</html>
